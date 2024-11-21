@@ -11,7 +11,6 @@ import dev.jwall64.midnightlib.event.HandlerList;
 import dev.jwall64.midnightlib.registry.Identifier;
 import dev.jwall64.midnightlib.registry.Registry;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
@@ -30,11 +29,11 @@ public class AmqpMessenger implements Messenger {
     private final boolean durable;
     private final int expiry;
 
+    private final DeliverCallback callback;
     private final Map<Identifier, HandlerList<Message>> queues = new ConcurrentHashMap<>();
 
     private Connection connection;
     private Channel channel;
-    private DeliverCallback callback;
 
     private CompletableFuture<?> connectionFuture;
 
