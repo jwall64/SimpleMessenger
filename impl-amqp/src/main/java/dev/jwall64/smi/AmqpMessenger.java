@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeoutException;
 
 public class AmqpMessenger implements Messenger {
 
@@ -135,6 +136,16 @@ public class AmqpMessenger implements Messenger {
     public void subscribe(Identifier channel, Object listener, EventHandler<Message> handler) {
         addQueue(channel);
         queues.get(channel).register(listener, handler);
+    }
+
+    @Override
+    public void close() {
+        try {
+            getChannel().close();
+            connection.close();
+        } catch (IOException | TimeoutException ex) {
+            log.error("Unable to close connection!");
+        }
     }
 
     private void addQueue(Identifier queue) {
