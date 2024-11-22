@@ -6,7 +6,6 @@ import org.slf4j.LoggerFactory;
 import dev.jwall64.mdcfg.ByteBufferInputStream;
 import dev.jwall64.mdcfg.serializer.ObjectSerializer;
 import dev.jwall64.mdcfg.serializer.Serializer;
-import dev.jwall64.midnightlib.event.EventHandler;
 import dev.jwall64.midnightlib.event.HandlerList;
 import dev.jwall64.midnightlib.registry.Identifier;
 import dev.jwall64.midnightlib.registry.Registry;
@@ -19,8 +18,9 @@ import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeoutException;
+import java.util.function.Consumer;
 
-public class AmqpMessenger implements Messenger {
+public class AmqpMessenger implements SerializableMessenger {
 
     private static final Logger log = LoggerFactory.getLogger(AmqpMessenger.class);
     private final String url;
@@ -31,7 +31,7 @@ public class AmqpMessenger implements Messenger {
     private final int expiry;
 
     private final DeliverCallback callback;
-    private final Map<Identifier, HandlerList<Message>> queues = new ConcurrentHashMap<>();
+    private final Map<String, HandlerList<Message>> queues = new ConcurrentHashMap<>();
 
     private Connection connection;
     private Channel channel;
@@ -47,7 +47,7 @@ public class AmqpMessenger implements Messenger {
         this.expiry = expiry;
 
         this.callback = (tag, delivery) -> {
-            Identifier queue = Identifier.parseOrDefault(delivery.getEnvelope().getRoutingKey(), "smi");
+            String queue = delivery.getEnvelope().getRoutingKey();
             HandlerList<Message> subscribers = queues.get(queue);
             if (subscribers == null) return;
 
@@ -116,7 +116,7 @@ public class AmqpMessenger implements Messenger {
         addQueue(msg.channel);
         try {
             AMQP.BasicProperties.Builder builder = new AMQP.BasicProperties.Builder().expiration(Objects.toString(expiry));
-            getChannel().basicPublish("", msg.channel.toString(), builder.build(), getBytes(msg.payload));
+            getChannel().basicPublish("", msg.channel, builder.build(), getBytes(msg.payload));
         } catch (IOException ex) {
             log.error("An error occurred while publishing a message!", ex);
         }
@@ -126,20 +126,20 @@ public class AmqpMessenger implements Messenger {
     public void publish(Message msg, long ttl) {
         addQueue(msg.channel);
         try {
-            getChannel().basicPublish("", msg.channel.toString(), null, getBytes(msg.payload));
+            getChannel().basicPublish("", msg.channel, null, getBytes(msg.payload));
         } catch (IOException ex) {
             log.error("An error occurred while publishing a message!", ex);
         }
     }
 
     @Override
-    public void subscribe(Identifier channel, Object listener, EventHandler<Message> handler) {
+    public void subscribe(String channel, Object listener, Consumer<Message> handler) {
         addQueue(channel);
-        queues.get(channel).register(listener, handler);
+        queues.get(channel).register(listener, handler::accept);
     }
 
     @Override
-    public void unsubscribeAll(Identifier channel) {
+    public void unsubscribeAll(String channel) {
         HandlerList<Message> hl = queues.get(channel);
         if(hl != null) {
             hl.unregisterAll();
@@ -147,7 +147,7 @@ public class AmqpMessenger implements Messenger {
     }
 
     @Override
-    public void unsubscribe(Identifier channel, Object listener) {
+    public void unsubscribe(String channel, Object listener) {
         HandlerList<Message> hl = queues.get(channel);
         if(hl != null) {
             hl.unregisterAll(listener);
@@ -164,7 +164,7 @@ public class AmqpMessenger implements Messenger {
         }
     }
 
-    private void addQueue(Identifier queue) {
+    private void addQueue(String queue) {
         queues.computeIfAbsent(queue, q -> {
             try {
                 Map<String, Object> args = new HashMap<>();
@@ -172,8 +172,8 @@ public class AmqpMessenger implements Messenger {
 
                 Channel channel = getChannel();
 
-                channel.queueDeclare(queue.toString(), durable, false, false, args);
-                channel.basicConsume(queue.toString(), true, callback, tag -> { });
+                channel.queueDeclare(q, durable, false, false, args);
+                channel.basicConsume(q, true, callback, tag -> { });
 
             } catch (IOException ex) {
                 log.error("An error occurred while subscribing to queue!", ex);

@@ -6,7 +6,10 @@ plugins {
 
 dependencies {
 
+    compileOnlyApi(libs.jetbrains.annotations)
+
     api(project(":api"))
+    api(project(":base"))
 
     api(libs.midnight.config)
     api(libs.midnight.lib)

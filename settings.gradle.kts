@@ -5,4 +5,5 @@ plugins {
 rootProject.name = "smi"
 
 include("api")
+include("base")
 include("impl-amqp")

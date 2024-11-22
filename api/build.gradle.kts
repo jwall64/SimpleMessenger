@@ -5,8 +5,5 @@ plugins {
 }
 
 dependencies {
-
-    api(libs.midnight.config)
-    api(libs.midnight.lib)
-
+    compileOnlyApi(libs.jetbrains.annotations)
 }
