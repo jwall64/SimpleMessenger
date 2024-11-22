@@ -139,6 +139,22 @@ public class AmqpMessenger implements Messenger {
     }
 
     @Override
+    public void unsubscribeAll(Identifier channel) {
+        HandlerList<Message> hl = queues.get(channel);
+        if(hl != null) {
+            hl.unregisterAll();
+        }
+    }
+
+    @Override
+    public void unsubscribe(Identifier channel, Object listener) {
+        HandlerList<Message> hl = queues.get(channel);
+        if(hl != null) {
+            hl.unregisterAll(listener);
+        }
+    }
+
+    @Override
     public void close() {
         try {
             getChannel().close();

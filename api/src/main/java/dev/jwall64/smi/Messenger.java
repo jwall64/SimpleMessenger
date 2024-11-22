@@ -17,6 +17,10 @@ public interface Messenger {
 
     void subscribe(Identifier channel, Object listener, EventHandler<Message> handler);
 
+    void unsubscribe(Identifier channel, Object listener);
+
+    void unsubscribeAll(Identifier channel);
+
     void close();
 
     static Serializer<Messenger> createSerializer(Registry<?, MessengerType<?>> types) {
