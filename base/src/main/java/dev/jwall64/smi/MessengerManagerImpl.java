@@ -7,30 +7,32 @@ import dev.jwall64.mdcfg.serializer.Serializer;
 import dev.jwall64.midnightlib.registry.Identifier;
 import dev.jwall64.midnightlib.registry.Registry;
 
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.Map;
 
 public class MessengerManagerImpl implements MessengerManager {
 
     private final Serializer<SerializableMessenger> serializer;
 
-    private final Map<String, SerializableMessenger> messengers;
+    private Map<String, SerializableMessenger> messengers;
 
     public MessengerManagerImpl(Registry<Identifier, MessengerType<?>> registry) {
         this.serializer = SerializableMessenger.createSerializer(registry.freeze());
-        this.messengers = new HashMap<>();
+        this.messengers = Collections.emptyMap();
     }
 
     public void loadAll(ConfigSection config) {
-        messengers.putAll(serializer.mapOf().deserialize(ConfigContext.INSTANCE, config).getOrThrow());
+        messengers.values().forEach(Messenger::close);
+        messengers = serializer.mapOf().deserialize(ConfigContext.INSTANCE, config).getOrThrow();
     }
 
-    public void saveAll(ConfigSection config) {
-        config.fill(serializer.mapOf().serialize(ConfigContext.INSTANCE, messengers).getOrThrow().asSection());
+    public ConfigSection saveAll() {
+        return serializer.mapOf().serialize(ConfigContext.INSTANCE, messengers).getOrThrow().asSection();
     }
 
     public void clear() {
-        messengers.clear();
+        messengers.values().forEach(Messenger::close);
+        messengers = Collections.emptyMap();
     }
 
     @Override
