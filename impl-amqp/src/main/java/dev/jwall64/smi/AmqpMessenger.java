@@ -164,6 +164,11 @@ public class AmqpMessenger implements SerializableMessenger {
         }
     }
 
+    @Override
+    public boolean isClosed() {
+        return !connection.isOpen();
+    }
+
     private void addQueue(String queue) {
         queues.computeIfAbsent(queue, q -> {
             try {

@@ -17,5 +17,7 @@ public interface Messenger {
 
     void close();
 
+    boolean isClosed();
+
 
 }
