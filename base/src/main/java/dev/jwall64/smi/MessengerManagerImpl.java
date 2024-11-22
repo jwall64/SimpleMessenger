@@ -41,6 +41,11 @@ public class MessengerManagerImpl implements MessengerManager {
         return messengers.get(name);
     }
 
+    @Override
+    public MessengerReference createReference(Messenger messenger) {
+        return null;
+    }
+
     public static void register(MessengerManagerImpl impl) {
         Holder.gInstance = impl;
     }

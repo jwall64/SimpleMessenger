@@ -12,6 +12,7 @@ public interface MessengerManager {
     @Nullable
     Messenger messenger(@Nullable String name);
 
+    MessengerReference createReference(Messenger messenger);
 
     @Nullable
     static Messenger getMessenger() {
@@ -23,6 +24,20 @@ public interface MessengerManager {
     static Messenger getMessenger(String name) {
         if(Holder.gInstance == null) return null;
         return Holder.gInstance.messenger(name);
+    }
+
+    @Nullable
+    static MessengerReference getMessengerReference() {
+        Messenger m = getMessenger();
+        if(m == null) return null;
+        return Holder.gInstance.createReference(m);
+    }
+
+    @Nullable
+    static MessengerReference getMessengerReference(String name) {
+        Messenger m = getMessenger(name);
+        if(m == null) return null;
+        return Holder.gInstance.createReference(m);
     }
 
     class Holder {
