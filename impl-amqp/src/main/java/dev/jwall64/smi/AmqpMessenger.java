@@ -23,7 +23,8 @@ import java.util.function.Consumer;
 public class AmqpMessenger implements SerializableMessenger {
 
     private static final Logger log = LoggerFactory.getLogger(AmqpMessenger.class);
-    private final String url;
+    private final String hostname;
+    private final Integer port;
     private final String username;
     private final String password;
     private final String vhost;
@@ -38,8 +39,9 @@ public class AmqpMessenger implements SerializableMessenger {
 
     private CompletableFuture<?> connectionFuture;
 
-    public AmqpMessenger(String url, String username, String password, String vhost, boolean durable, int expiry) {
-        this.url = url;
+    public AmqpMessenger(String hostname, Integer port, String username, String password, String vhost, boolean durable, int expiry) {
+        this.hostname = hostname;
+        this.port = port;
         this.username = username;
         this.password = password;
         this.vhost = vhost;
@@ -57,11 +59,12 @@ public class AmqpMessenger implements SerializableMessenger {
         connectionFuture = CompletableFuture.runAsync(() -> {
 
             ConnectionFactory factory = new ConnectionFactory();
-            factory.setHost(url);
+            factory.setHost(hostname);
 
+            if (port != null) factory.setPort(port);
             if (username != null) factory.setUsername(username);
             if (password != null) factory.setPassword(password);
-            if (vhost != null) factory.setPassword(vhost);
+            if (vhost != null) factory.setVirtualHost(vhost);
 
             try {
                 connection = factory.newConnection();
@@ -82,8 +85,12 @@ public class AmqpMessenger implements SerializableMessenger {
         return channel;
     }
 
-    public String getUrl() {
-        return url;
+    public String getHostname() {
+        return hostname;
+    }
+
+    public int getPort() {
+        return port;
     }
 
     public String getUsername() {
@@ -210,7 +217,8 @@ public class AmqpMessenger implements SerializableMessenger {
     }
 
     public static final Serializer<AmqpMessenger> SERIALIZER = ObjectSerializer.create(
-            Serializer.STRING.entry("url", AmqpMessenger::getUrl),
+            Serializer.STRING.entry("hostname", AmqpMessenger::getHostname),
+            Serializer.INT.entry("port", AmqpMessenger::getPort).optional(),
             Serializer.STRING.entry("username", AmqpMessenger::getUsername).optional(),
             Serializer.STRING.entry("password", AmqpMessenger::getPassword).optional(),
             Serializer.STRING.entry("virtual_host", AmqpMessenger::getVirtualHost).optional(),
