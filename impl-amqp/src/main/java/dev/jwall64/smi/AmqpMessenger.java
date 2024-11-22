@@ -199,7 +199,17 @@ public class AmqpMessenger implements Messenger {
     );
 
     public static final Identifier ID = new Identifier("smi", "amqp");
-    public static final MessengerType<AmqpMessenger> TYPE = new MessengerType<>(AmqpMessenger.class, SERIALIZER);
+    public static final MessengerType<AmqpMessenger> TYPE = new MessengerType<AmqpMessenger>() {
+        @Override
+        public Class<AmqpMessenger> getMessengerClass() {
+            return AmqpMessenger.class;
+        }
+
+        @Override
+        public Serializer<AmqpMessenger> getSerializer() {
+            return SERIALIZER;
+        }
+    };
 
     public static void register(Registry<Identifier, MessengerType<?>> registry) {
         registry.register(ID, TYPE);
