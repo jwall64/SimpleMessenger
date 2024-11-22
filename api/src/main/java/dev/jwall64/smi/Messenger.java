@@ -43,14 +43,14 @@ public interface Messenger {
 
             private <O, T extends Messenger> SerializeResult<O> serializeGeneric(SerializeContext<O> context, Messenger messenger, MessengerType<T> type) {
 
-                if(!type.messengerClass.isAssignableFrom(messenger.getClass())) {
+                if(!type.getMessengerClass().isAssignableFrom(messenger.getClass())) {
                     return SerializeResult.failure("Wrong type of messenger " + messenger.getClass());
                 }
-                return type.serializer.serialize(context, type.messengerClass.cast(messenger));
+                return type.getSerializer().serialize(context, type.getMessengerClass().cast(messenger));
             }
 
             private <O, T extends Messenger> SerializeResult<T> deserializeGeneric(SerializeContext<O> context, O value, MessengerType<T> type) {
-                return type.serializer.deserialize(context, value);
+                return type.getSerializer().deserialize(context, value);
             }
         };
 
