@@ -68,7 +68,7 @@ public class AmqpMessenger implements SerializableMessenger {
                 connection = factory.newConnection();
                 channel = connection.createChannel();
 
-                channel.exchangeDeclare(exchange, BuiltinExchangeType.DIRECT, durable);
+                channel.exchangeDeclare(exchange, BuiltinExchangeType.FANOUT, durable);
 
                 this.consumer = new DefaultConsumer(channel) {
 
@@ -80,11 +80,6 @@ public class AmqpMessenger implements SerializableMessenger {
                         if (subscribers != null) subscribers.invoke(new Message(queue, ByteBuffer.wrap(body)));
 
                         channel.basicAck(envelope.getDeliveryTag(), false);
-                    }
-
-                    @Override
-                    public void handleShutdownSignal(String consumerTag, ShutdownSignalException sig) {
-                        log.info("AMQP consumer was shut down");
                     }
                 };
 
