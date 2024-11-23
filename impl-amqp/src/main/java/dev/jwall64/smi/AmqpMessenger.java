@@ -12,7 +12,6 @@ import dev.jwall64.midnightlib.registry.Registry;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
@@ -30,8 +29,8 @@ public class AmqpMessenger implements SerializableMessenger {
     private final String password;
     private final String vhost;
     private final String exchange;
+    private final String exchangeType;
     private final boolean durable;
-    private final int expiry;
 
 
     private final Map<String, HandlerList<Message>> queues = new ConcurrentHashMap<>();
@@ -43,7 +42,7 @@ public class AmqpMessenger implements SerializableMessenger {
     private CompletableFuture<?> connectionFuture;
 
 
-    public AmqpMessenger(String hostname, Integer port, String username, String password, String vhost, String exchange, boolean durable, int expiry) {
+    public AmqpMessenger(String hostname, Integer port, String username, String password, String vhost, String exchange, String exchangeType, boolean durable) {
         this.hostname = hostname;
         this.port = port;
         this.username = username;
@@ -51,7 +50,7 @@ public class AmqpMessenger implements SerializableMessenger {
         this.vhost = vhost;
         this.durable = durable;
         this.exchange = exchange;
-        this.expiry = expiry;
+        this.exchangeType = exchangeType;
 
 
         connectionFuture = CompletableFuture.runAsync(() -> {
@@ -68,7 +67,7 @@ public class AmqpMessenger implements SerializableMessenger {
                 connection = factory.newConnection();
                 channel = connection.createChannel();
 
-                channel.exchangeDeclare(exchange, BuiltinExchangeType.FANOUT, durable);
+                channel.exchangeDeclare(exchange, exchangeType, durable);
 
                 this.consumer = new DefaultConsumer(channel) {
 
@@ -78,8 +77,6 @@ public class AmqpMessenger implements SerializableMessenger {
                         String queue = envelope.getRoutingKey();
                         HandlerList<Message> subscribers = queues.get(queue);
                         if (subscribers != null) subscribers.invoke(new Message(queue, ByteBuffer.wrap(body)));
-
-                        channel.basicAck(envelope.getDeliveryTag(), false);
                     }
                 };
 
@@ -123,12 +120,12 @@ public class AmqpMessenger implements SerializableMessenger {
         return exchange;
     }
 
-    public boolean isDurable() {
-        return durable;
+    public String getExchangeType() {
+        return exchangeType;
     }
 
-    public int getQueueExpiry() {
-        return expiry;
+    public boolean isDurable() {
+        return durable;
     }
 
     @Override
@@ -138,7 +135,6 @@ public class AmqpMessenger implements SerializableMessenger {
 
     @Override
     public void publish(Message msg) {
-        addQueue(msg.channel);
         try {
             getChannel().basicPublish(exchange, msg.channel, null, getBytes(msg.payload));
         } catch (IOException ex) {
@@ -148,7 +144,6 @@ public class AmqpMessenger implements SerializableMessenger {
 
     @Override
     public void publish(Message msg, long ttl) {
-        addQueue(msg.channel);
         try {
             AMQP.BasicProperties.Builder builder = new AMQP.BasicProperties.Builder().deliveryMode(2).expiration(Objects.toString(ttl));
             getChannel().basicPublish(exchange, msg.channel, builder.build(), getBytes(msg.payload));
@@ -158,9 +153,24 @@ public class AmqpMessenger implements SerializableMessenger {
     }
 
     @Override
-    public void subscribe(String channel, Object listener, Consumer<Message> handler) {
-        addQueue(channel);
-        queues.get(channel).register(listener, handler::accept);
+    public void subscribe(String routingKey, Object listener, Consumer<Message> handler) {
+        queues.computeIfAbsent(routingKey, key -> {
+
+            try {
+                Channel channel = getChannel();
+
+                AMQP.Queue.DeclareOk res = channel.queueDeclare(durable ? key : "", durable, !durable, !durable, null);
+
+                channel.queueBind(res.getQueue(), exchange, key);
+                channel.basicConsume(res.getQueue(), true, consumer);
+
+            } catch (IOException ex) {
+                log.error("An error occurred while subscribing to queue!", ex);
+            }
+
+            return new HandlerList<>();
+
+        }).register(listener, handler::accept);
     }
 
     @Override
@@ -194,27 +204,6 @@ public class AmqpMessenger implements SerializableMessenger {
         return !connection.isOpen();
     }
 
-    private void addQueue(String queue) {
-        if(!queues.containsKey(queue)) {
-            try {
-                Map<String, Object> args = new HashMap<>();
-                if (expiry > 0) args.put("x-expires", expiry);
-
-                Channel channel = getChannel();
-
-                channel.queueDeclare(queue, durable, false, false, args);
-                channel.queueBind(queue, exchange, queue);
-
-                channel.basicConsume(queue, false, consumer);
-
-                queues.put(queue, new HandlerList<>());
-
-            } catch (IOException ex) {
-                log.error("An error occurred while subscribing to queue!", ex);
-            }
-        }
-    }
-
     private byte[] getBytes(ByteBuffer buffer) throws IOException {
         byte[] data;
         if(buffer.hasArray()) {
@@ -244,8 +233,8 @@ public class AmqpMessenger implements SerializableMessenger {
             Serializer.STRING.entry("password", AmqpMessenger::getPassword).optional(),
             Serializer.STRING.entry("virtual_host", AmqpMessenger::getVirtualHost).optional(),
             Serializer.STRING.entry("exchange", AmqpMessenger::getExchange).orElse("smi"),
+            Serializer.STRING.entry("exchange_type", AmqpMessenger::getExchangeType).orElse("direct"),
             Serializer.BOOLEAN.entry("durable", AmqpMessenger::isDurable).orElse(false),
-            Serializer.INT.entry("queue_expiry", AmqpMessenger::getQueueExpiry).orElse(0),
             AmqpMessenger::new
     );
 
