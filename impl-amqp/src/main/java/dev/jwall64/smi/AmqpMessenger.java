@@ -33,10 +33,12 @@ public class AmqpMessenger implements SerializableMessenger {
     private final boolean durable;
     private final int expiry;
 
+
     private final Map<String, HandlerList<Message>> queues = new ConcurrentHashMap<>();
 
     private Connection connection;
     private Channel channel;
+    private DefaultConsumer consumer;
 
     private CompletableFuture<?> connectionFuture;
 
@@ -50,6 +52,7 @@ public class AmqpMessenger implements SerializableMessenger {
         this.durable = durable;
         this.exchange = exchange;
         this.expiry = expiry;
+
 
         connectionFuture = CompletableFuture.runAsync(() -> {
 
@@ -66,6 +69,24 @@ public class AmqpMessenger implements SerializableMessenger {
                 channel = connection.createChannel();
 
                 channel.exchangeDeclare(exchange, BuiltinExchangeType.DIRECT, durable);
+
+                this.consumer = new DefaultConsumer(channel) {
+
+                    @Override
+                    public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
+
+                        String queue = envelope.getRoutingKey();
+                        HandlerList<Message> subscribers = queues.get(queue);
+                        if (subscribers != null) subscribers.invoke(new Message(queue, ByteBuffer.wrap(body)));
+
+                        channel.basicAck(envelope.getDeliveryTag(), false);
+                    }
+
+                    @Override
+                    public void handleShutdownSignal(String consumerTag, ShutdownSignalException sig) {
+                        log.info("AMQP consumer was shut down");
+                    }
+                };
 
             } catch (Exception ex) {
                 log.error("Unable to connect to AMQP server!", ex);
@@ -189,16 +210,7 @@ public class AmqpMessenger implements SerializableMessenger {
                 channel.queueDeclare(queue, durable, false, false, args);
                 channel.queueBind(queue, exchange, queue);
 
-                channel.basicConsume(queue, true, new DefaultConsumer(channel) {
-                    @Override
-                    public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
-                        String queue = envelope.getRoutingKey();
-                        HandlerList<Message> subscribers = queues.get(queue);
-                        if (subscribers == null) return;
-
-                        subscribers.invoke(new Message(queue, ByteBuffer.wrap(body)));
-                    }
-                });
+                channel.basicConsume(queue, false, consumer);
 
                 queues.put(queue, new HandlerList<>());
 
