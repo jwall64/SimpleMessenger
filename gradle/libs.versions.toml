@@ -1,26 +1,14 @@
 [versions]
-junit = "5.10.2"
 slf4j = "2.0.16"
 jbr-anno = "24.0.1"
-midnight-config = "2.5.1-SNAPSHOT"
-midnight-lib = "1.7.1"
-midnight-core = "2.0.0-SNAPSHOT"
-midnight-proxy = "0.6.0-SNAPSHOT"
-matchmaker = "0.1.0-SNAPSHOT"
+midnight-config = "2.5.1"
+midnight-lib = "1.7.2"
 rabbitmq = "5.21.0"
 
 [libraries]
 jetbrains-annotations = { module = "org.jetbrains:annotations", version.ref="jbr-anno" }
-junit-bom = { module = "org.junit:junit-bom", version.ref = "junit" }
-junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit" }
 slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
 slf4j-simple = { module = "org.slf4j:slf4j-simple", version.ref = "slf4j" }
 midnight-config = { module = "dev.jwall64:midnightcfg-api", version.ref="midnight-config" }
-midnight-config-sql = { module = "dev.jwall64:midnightcfg-api-sql", version.ref="midnight-config" }
 midnight-lib = { module = "dev.jwall64:midnightlib", version.ref="midnight-lib" }
-midnight-core = { module = "dev.jwall64:midnightcore-common", version.ref="midnight-core" }
-midnight-core-server = { module = "dev.jwall64:midnightcore-server", version.ref="midnight-core" }
-midnight-core-fabric = { module = "dev.jwall64:midnightcore-fabric", version.ref="midnight-core" }
-midnight-proxy = { module = "dev.jwall64:midnightproxy-api", version.ref="midnight-proxy" }
-matchmaker = { module = "dev.jwall64:matchmaker-api", version.ref="matchmaker" }
 rabbitmq-client = { module = "com.rabbitmq:amqp-client", version.ref="rabbitmq" }
