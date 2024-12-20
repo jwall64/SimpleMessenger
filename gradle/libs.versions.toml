@@ -1,8 +1,8 @@
 [versions]
 slf4j = "2.0.16"
 jbr-anno = "24.0.1"
-midnight-config = "2.5.1"
-midnight-lib = "1.7.2"
+midnight-config = "3.0.0-SNAPSHOT"
+midnight-lib = "2.0.0-SNAPSHOT"
 rabbitmq = "5.21.0"
 
 [libraries]
