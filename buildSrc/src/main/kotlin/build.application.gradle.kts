@@ -5,4 +5,7 @@ plugins {
 
 tasks.withType<JavaExec>() {
     workingDir = file("run/")
+    run {
+        mkdir("run/")
+    }
 }

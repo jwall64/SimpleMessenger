@@ -2,10 +2,10 @@ package dev.jwall64.smi;
 
 import org.jetbrains.annotations.Nullable;
 import dev.jwall64.mdcfg.ConfigSection;
+import dev.jwall64.mdcfg.registry.Identifier;
+import dev.jwall64.mdcfg.registry.Registry;
 import dev.jwall64.mdcfg.serializer.ConfigContext;
 import dev.jwall64.mdcfg.serializer.Serializer;
-import dev.jwall64.midnightlib.registry.Identifier;
-import dev.jwall64.midnightlib.registry.Registry;
 
 import java.util.Collections;
 import java.util.Map;

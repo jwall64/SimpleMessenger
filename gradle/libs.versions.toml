@@ -1,8 +1,8 @@
 [versions]
 slf4j = "2.0.16"
 jbr-anno = "24.0.1"
-midnight-config = "3.0.0"
-midnight-lib = "2.0.0"
+midnight-config = "3.2.0-SNAPSHOT"
+midnight-lib = "2.1.0"
 rabbitmq = "5.21.0"
 
 [libraries]
@@ -10,5 +10,6 @@ jetbrains-annotations = { module = "org.jetbrains:annotations", version.ref="jbr
 slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
 slf4j-simple = { module = "org.slf4j:slf4j-simple", version.ref = "slf4j" }
 midnight-config = { module = "dev.jwall64:midnightcfg-api", version.ref="midnight-config" }
+midnight-config-mc = { module = "dev.jwall64:midnightcfg-platform-minecraft", version.ref="midnight-config" }
 midnight-lib = { module = "dev.jwall64:midnightlib", version.ref="midnight-lib" }
 rabbitmq-client = { module = "com.rabbitmq:amqp-client", version.ref="rabbitmq" }

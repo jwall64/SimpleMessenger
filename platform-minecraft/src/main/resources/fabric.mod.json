@@ -1,0 +1,28 @@
+{
+    "schemaVersion": 1,
+    "id": "${id}",
+    "version": "${version}",
+    "environment": "*",
+    "entrypoints": {
+        "main": [
+            "dev.jwall64.smi.mc.impl.Init"
+        ]
+    },
+    "depends": {
+        "fabricloader": "*",
+        "fabric-api-base": "*",
+        "fabric-lifecycle-events-v1": "*",
+        "midnightcfg": "*"
+    },
+    "name": "SimpleMessenger",
+    "description": "Provides an interface for mods to send messages to other servers or services.",
+    "contact": {
+        "homepage": "https://github.com/jwall64/MidnightConfig"
+    },
+    "authors": [
+        {
+            "name": "jwall64"
+        }
+    ],
+    "license": "LGPL"
+}

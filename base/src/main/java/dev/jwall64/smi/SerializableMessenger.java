@@ -1,9 +1,9 @@
 package dev.jwall64.smi;
 
+import dev.jwall64.mdcfg.registry.Registry;
 import dev.jwall64.mdcfg.serializer.SerializeContext;
 import dev.jwall64.mdcfg.serializer.SerializeResult;
 import dev.jwall64.mdcfg.serializer.Serializer;
-import dev.jwall64.midnightlib.registry.Registry;
 
 public interface SerializableMessenger extends Messenger {
 

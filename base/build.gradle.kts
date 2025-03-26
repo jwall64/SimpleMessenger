@@ -10,6 +10,5 @@ dependencies {
 
     api(project(":api"))
     api(libs.midnight.config)
-    api(libs.midnight.lib)
 
 }

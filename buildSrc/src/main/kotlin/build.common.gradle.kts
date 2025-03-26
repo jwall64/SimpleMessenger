@@ -1,4 +1,4 @@
-import buildlogic.Utils
+import buildlogic.Utils;
 
 plugins {
     id("java")

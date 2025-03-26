@@ -1,0 +1,13 @@
+{
+    "schemaVersion": 1,
+    "id": "${id}-testmod",
+    "version": "${version}",
+    "environment": "*",
+    "entrypoints": {
+        "main": [
+            "dev.jwall64.smi.mc.test.Init"
+        ],
+        "client": [ ]
+    },
+    "license": "LGPL"
+}
