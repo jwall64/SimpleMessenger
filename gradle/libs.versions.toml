@@ -1,9 +1,9 @@
 [versions]
 slf4j = "2.0.16"
 jbr-anno = "24.0.1"
-midnight-config = "3.2.0-SNAPSHOT"
+midnight-config = "3.2.0"
 midnight-lib = "2.1.0"
-rabbitmq = "5.21.0"
+rabbitmq = "5.24.0"
 
 [libraries]
 jetbrains-annotations = { module = "org.jetbrains:annotations", version.ref="jbr-anno" }

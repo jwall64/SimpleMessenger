@@ -18,9 +18,12 @@ dependencies {
     api(project(":base"))
     api(project(":impl-amqp"))
 
-    shadow(project(":api"))
-    shadow(project(":base"))
-    shadow(project(":impl-amqp"))
+    shadow(project(":api")) { isTransitive = false }
+    shadow(project(":base")) { isTransitive = false }
+    shadow(project(":impl-amqp")) { isTransitive = false }
+
+    include(libs.rabbitmq.client) { isTransitive = false }
+    include(libs.midnight.lib) { isTransitive = false }
 
     // Fabric API
     val apiModules = listOf(
