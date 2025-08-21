@@ -10,13 +10,13 @@ Utils.setupResources(project, rootProject, "fabric.mod.json")
 
 dependencies {
 
-    minecraft("com.mojang:minecraft:1.21.5")
+    minecraft("com.mojang:minecraft:1.21.8")
     mappings(loom.officialMojangMappings())
-    modImplementation("net.fabricmc:fabric-loader:0.16.10")
+    modImplementation("net.fabricmc:fabric-loader:0.16.14")
 
     api(project(":api"))
-    api(project(":base"))
-    api(project(":impl-amqp"))
+    implementation(project(":base"))
+    implementation(project(":impl-amqp"))
 
     shadow(project(":api")) { isTransitive = false }
     shadow(project(":base")) { isTransitive = false }
@@ -31,7 +31,7 @@ dependencies {
         "fabric-lifecycle-events-v1"
     )
     for(mod in apiModules) {
-        modApi(fabricApi.module(mod, "0.119.5+1.21.5"))
+        modApi(fabricApi.module(mod, "0.131.0+1.21.8"))
     }
 
     modImplementation(libs.midnight.config.mc)
