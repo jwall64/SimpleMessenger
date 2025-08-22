@@ -231,44 +231,7 @@ public class AmqpMessenger implements SerializableMessenger {
         }
         return data;
     }
-    //
-    // private static class EnvSerializer<T> implements Serializer<T> {
-    //
-    //     private final InlineSerializer<T> inlineSerializer;
-    //
-    //     EnvSerializer(InlineSerializer<T> inlineSerializer) {
-    //         this.inlineSerializer = inlineSerializer;
-    //     }
-    //
-    //     @Override
-    //     public <O> SerializeResult<O> serialize(SerializeContext<O> ctx,
-    //                                             T value) {
-    //         return inlineSerializer.serialize(ctx, value);
-    //     }
-    //
-    //     @Override
-    //     public <O> SerializeResult<T> deserialize(SerializeContext<O> ctx,
-    //                                               O value) {
-    //
-    //         if (ctx.isString(value)) {
-    //             return inlineSerializer.deserialize(ctx, value);
-    //         } else if (ctx.isMap(value)) {
-    //             return ctx.asString(ctx.get("env", value)).map(str -> {
-    //                 String env = System.getenv(str);
-    //                 if (env == null) {
-    //                     env = "";
-    //                 }
-    //                 return inlineSerializer.deserialize(ctx,
-    //                 ctx.toString(env));
-    //             });
-    //         }
-    //
-    //         return SerializeResult.failure("Not value or environment key! ("
-    //         +
-    //                                        value + ")");
-    //     }
-    // }
-    //
+
     public static final Serializer<AmqpMessenger> SERIALIZER =
         ObjectSerializer.create(
             Serializer.STRING.orEnv().entry("hostname",
