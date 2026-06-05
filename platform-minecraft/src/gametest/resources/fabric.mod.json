@@ -1,13 +1,12 @@
 {
     "schemaVersion": 1,
-    "id": "${id}-testmod",
+    "id": "${id}-tests",
     "version": "${version}",
     "environment": "*",
     "entrypoints": {
-        "main": [
-            "dev.jwall64.smi.mc.test.Init"
-        ],
-        "client": [ ]
+        "fabric-gametest": [
+            "dev.jwall64.smi.mc.test.GameTests"
+        ]
     },
     "license": "LGPL"
 }

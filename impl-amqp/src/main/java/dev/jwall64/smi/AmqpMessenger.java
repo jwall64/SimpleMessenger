@@ -14,10 +14,7 @@ import org.slf4j.LoggerFactory;
 import dev.jwall64.mdcfg.ByteBufferInputStream;
 import dev.jwall64.mdcfg.registry.Identifier;
 import dev.jwall64.mdcfg.registry.Registry;
-import dev.jwall64.mdcfg.serializer.InlineSerializer;
 import dev.jwall64.mdcfg.serializer.ObjectSerializer;
-import dev.jwall64.mdcfg.serializer.SerializeContext;
-import dev.jwall64.mdcfg.serializer.SerializeResult;
 import dev.jwall64.mdcfg.serializer.Serializer;
 import dev.jwall64.midnightlib.event.HandlerList;
 

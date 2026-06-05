@@ -8,20 +8,15 @@ import java.util.Map;
 
 public class Utils {
 
-    public static String getArchiveName(Project project, Project rootProject) {
-        if(rootProject == project) {
-            return project.getName();
-        } else {
-            StringBuilder name = new StringBuilder(project.getName());
-            var currentParent = project.getParent();
-            while(currentParent != rootProject) {
-                if(currentParent == null) continue;
+    public static String getArchiveName(Project project) {
 
-                name.insert(0, currentParent.getName() + "-");
-                currentParent = currentParent.getParent();
-            }
-            return rootProject.getName() + "-" + name;
+        StringBuilder name = new StringBuilder(project.getName());
+        var currentParent = project.getParent();
+        while(currentParent != null) {
+            name.insert(0, currentParent.getName() + "-");
+            currentParent = currentParent.getParent();
         }
+        return name.toString();
     }
 
     public static void setupResources(Project project, Project rootProject, String filePattern) {

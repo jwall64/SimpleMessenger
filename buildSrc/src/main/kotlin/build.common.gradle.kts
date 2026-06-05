@@ -21,13 +21,13 @@ dependencies {
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
+        languageVersion = JavaLanguageVersion.of(25)
     }
     withSourcesJar()
 }
 
 tasks.withType<Jar> {
-    archiveBaseName.set(Utils.getArchiveName(project, rootProject))
+    archiveBaseName.set(Utils.getArchiveName(project))
 }
 
 tasks.named<Test>("test") {
