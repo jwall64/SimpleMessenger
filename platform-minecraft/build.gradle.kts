@@ -7,8 +7,8 @@ plugins {
 
 dependencies {
 
-    minecraft("com.mojang:minecraft:26.1.2")
-    implementation("net.fabricmc:fabric-loader:0.19.2")
+    minecraft("com.mojang:minecraft:26.3")
+    implementation("net.fabricmc:fabric-loader:0.20.1")
 
     api(project(":api"))
     implementation(project(":base"))
@@ -27,7 +27,7 @@ dependencies {
         "fabric-lifecycle-events-v1"
     )
     for(mod in apiModules) {
-        api(fabricApi.module(mod, "0.150.0+26.1.2"))
+        api(fabricApi.module(mod, "0.165.2+26.3"))
     }
 
     implementation(libs.midnight.config.mc)
@@ -44,6 +44,6 @@ dependencies {
         "fabric-registry-sync-v0"
     )
     for(mod in testApiModules) {
-        gametestImplementation(fabricApi.module(mod, "0.150.0+26.1.2"))
+        gametestImplementation(fabricApi.module(mod, "0.165.2+26.3"))
     }
 }
